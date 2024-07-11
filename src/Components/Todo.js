@@ -11,24 +11,26 @@ import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 // OTHERS
+import { useContext, useState } from "react";
 import { TodosContext } from "../Context/todosContext";
-import { useContext } from "react";
 
 // DIALOG IMPORTS
-import Button from '@mui/material/Button';
+import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-
-const open = false;
+import TextField from "@mui/material/TextField";
 
 // Todo component to display each individual task
-const Todo = ({ todo, handleCheck }) => {
+const Todo = ({ todo }) => {
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [updatedTodo, setUpdateTodo] = useState({ title: todo.title, details: todo.details });
   const { todos, setTodos } = useContext(TodosContext);
 
-  // Function to handle the check button click event
+  // Start Function to handle the check button click event
   function handleCheckClick() {
     const updatedTodos = todos.map((t) => {
       if (t.id === todo.id) {
@@ -43,32 +45,118 @@ const Todo = ({ todo, handleCheck }) => {
     });
     setTodos(updatedTodos);
   }
+  // End Function to handle the check button click event
+
+  // Handle delete button click event
+  function handleDeleteClick() {
+    setShowDeleteDialog(true);
+  }
+  // Handle update button click event
+  function handleUpdateClick() {
+    setShowUpdateDialog(true);
+  }
+  // Close delete dialog
+  function handleDeleteModalClose() {
+    setShowDeleteDialog(false);
+  }
+  // Close update dialog
+  function handleUpdateClose() {
+    setShowUpdateDialog(false);
+  }
+
+  // Confirm delete action
+  function confirmDelete() {
+    const updatedTodos = todos.filter((t) => {
+      // if (t.id === todo.id) {
+      //   return false;
+      // } else {
+      //   return true;
+      // }
+      return t.id !== todo.id;
+    });
+    setTodos(updatedTodos);
+  }
+
+  // Confirm update action
+  function confirmUpdate() {
+    const updatedTodos = todos.map((t) => {
+      if (t.id === todo.id) {
+        return { ...t, title: updatedTodo.title, details: updatedTodo.details };
+      } else {
+        return t;
+      }
+    });
+    setTodos(updatedTodos);
+    handleUpdateClose();
+  }
 
   return (
     <>
       {/* ==== START DELETE MODAL ====  */}
       <Dialog
-        open={open}
+        onClose={handleDeleteModalClose}
+        open={showDeleteDialog}
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">
-          {"Use Google's location service?"}
+          Are you sure you want to delete this task?
         </DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
-            Let Google help apps determine location. This means sending
-            anonymous location data to Google, even when no apps are running.
+            This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button >Disagree</Button>
-          <Button  autoFocus>
-            Agree
+          <Button onClick={handleDeleteModalClose}>Cancel</Button>
+          <Button autoFocus onClick={confirmDelete}>
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
       {/* ==== END DELET MODAL ==== */}
+
+      {/* ==== START UPDATE  MODAL ====  */}
+      <Dialog
+        onClose={handleUpdateClose}
+        open={showUpdateDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Edit Task</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Title Task"
+            fullWidth
+            value={updatedTodo.title}
+            onChange={(e) => {
+              setUpdateTodo({ ...updatedTodo, title: e.target.value });
+            }}
+          />
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Details"
+            fullWidth
+            value={updatedTodo.details}
+            onChange={(e) => {
+              setUpdateTodo({ ...updatedTodo, details: e.target.value });
+            }}
+          />
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={handleUpdateClose}>Cancel</Button>
+          <Button autoFocus onClick={confirmUpdate}>
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* ==== END UPDATE MODAL ==== */}
       <Card
         className="todoCard"
         sx={{
@@ -110,8 +198,11 @@ const Todo = ({ todo, handleCheck }) => {
               >
                 <CheckIcon />
               </IconButton>
-              {/* ==== End Check Icon Button ====*/}
+              {/* ==== End Check Icon Button ==== */}
+
+              {/* ==== Start Edite Icon Button ====  */}
               <IconButton
+                onClick={handleUpdateClick}
                 className="iconButton"
                 aria-label="delete"
                 sx={{
@@ -122,6 +213,7 @@ const Todo = ({ todo, handleCheck }) => {
               >
                 <ModeEditOutlinedIcon />
               </IconButton>
+              {/* ==== Start Delete Icon Button ====  */}
               <IconButton
                 className="iconButton"
                 aria-label="delete"
@@ -130,10 +222,11 @@ const Todo = ({ todo, handleCheck }) => {
                   background: "white",
                   border: "solid #b23c17 3px",
                 }}
+                onClick={handleDeleteClick}
               >
                 <DeleteOutlineOutlinedIcon />
               </IconButton>
-              {/* ==== END ACTIION BUTTONS ==== */}
+              {/* ==== End Delete Icon Button ====  */}
             </Grid>
           </Grid>
         </CardContent>
