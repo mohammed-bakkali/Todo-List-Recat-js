@@ -23,9 +23,29 @@ import { v4 as uuidv4 } from "uuid";
 export default function TodoList() {
   const { todos, setTodos } = useContext(TodosContext);
   const [titleInput, setTitleInput] = useState(""); // State for the input field
+  const [displayedTodosType, setDisplayedTodosType] = useState("all");
+
+  // filteration arrays
+  const completedTodos = todos.filter((t) => {
+    return t.isCompleted;
+  });
+
+  const notcompletedTodos = todos.filter((t) => {
+    return !t.isCompleted;
+  });
+
+  let todosToBeRendered = todos;
+
+  if (displayedTodosType === "completed") {
+    todosToBeRendered = completedTodos;
+  } else if (displayedTodosType === "non-completed") {
+    todosToBeRendered = notcompletedTodos;
+  } else {
+    todosToBeRendered = todos;
+  }
 
   // Convert the list of todos to JSX elements
-  const todosJsx = todos.map((t) => {
+  const todosJsx = todosToBeRendered.map((t) => {
     return <Todo key={t.id} todo={t} />;
   });
 
@@ -34,6 +54,10 @@ export default function TodoList() {
     setTodos(storageTodos);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function changeDisplayedType(e) {
+    setDisplayedTodosType(e.target.value);
+  }
 
   // Function to handle the addition of a new todo item
   function handleAddClick() {
@@ -53,7 +77,13 @@ export default function TodoList() {
 
   return (
     <Container maxWidth="sm">
-      <Card sx={{ minWidth: 270 }}>
+      <Card
+        sx={{ minWidth: 275 }}
+        style={{
+          maxHeight: "80vh",
+          overflow: "scroll",
+        }}
+      >
         <CardContent>
           <Typography style={{ fontWeight: "bold" }} variant="h2">
             My Tasks
@@ -66,10 +96,12 @@ export default function TodoList() {
             color="primary"
             exclusive
             aria-label="Platform"
+            value={displayedTodosType}
+            onChange={changeDisplayedType}
           >
             <ToggleButton value="all">All</ToggleButton>
-            <ToggleButton value="done">Done</ToggleButton>
-            <ToggleButton value="unfulfilled">Unfulfilled</ToggleButton>
+            <ToggleButton value="completed">Done</ToggleButton>
+            <ToggleButton value="non-completed">Unfulfilled</ToggleButton>
           </ToggleButtonGroup>
           {/* ==== END FILTER BUTTONS ==== */}
 
@@ -89,6 +121,7 @@ export default function TodoList() {
                 style={{ width: "100%", height: "100%" }}
                 variant="contained"
                 onClick={handleAddClick}
+                disabled={titleInput.length <= 0}
               >
                 Add Task
               </Button>

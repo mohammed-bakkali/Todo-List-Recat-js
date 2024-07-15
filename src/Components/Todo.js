@@ -37,11 +37,6 @@ const Todo = ({ todo }) => {
   function handleCheckClick() {
     const updatedTodos = todos.map((t) => {
       if (t.id === todo.id) {
-        // if (t.isCompleted === true) {
-        //   t.isCompleted = false;
-        // } else {
-        //   t.isCompleted = true;
-        // }
         t.isCompleted = !t.isCompleted;
       }
       return t;
@@ -71,11 +66,6 @@ const Todo = ({ todo }) => {
   // Confirm delete action
   function confirmDelete() {
     const updatedTodos = todos.filter((t) => {
-      // if (t.id === todo.id) {
-      //   return false;
-      // } else {
-      //   return true;
-      // }
       return t.id !== todo.id;
     });
     setTodos(updatedTodos);
@@ -175,7 +165,14 @@ const Todo = ({ todo }) => {
         <CardContent>
           <Grid container spacing={2}>
             <Grid xs={8}>
-              <Typography variant="h5" sx={{ textAlign: "left" }} gutterBottom>
+              <Typography
+                variant="h5"
+                sx={{
+                  textAlign: "left",
+                  textDecoration: todo.isCompleted ? "line-through" : "none",
+                }}
+                gutterBottom
+              >
                 {todo.title}
               </Typography>
               <Typography variant="h6" sx={{ textAlign: "left" }} gutterBottom>

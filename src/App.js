@@ -11,6 +11,12 @@ const theme = createTheme({
   typography: {
     fontFamily: ["Roboto"],
   },
+
+  palette: {
+    primary: {
+      main: "#004d40",
+    },
+  },
 });
 // Initial list of todos
 const initialTodos = [
@@ -47,7 +53,7 @@ function App() {
           fontFamily: "Roboto",
         }}
       >
-        <TodosContext.Provider value={{todos: todos, setTodos: setTodos}}>
+        <TodosContext.Provider value={{ todos: todos, setTodos: setTodos }}>
           <TodoList />
         </TodosContext.Provider>
       </div>
