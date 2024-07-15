@@ -27,7 +27,10 @@ import TextField from "@mui/material/TextField";
 const Todo = ({ todo }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
-  const [updatedTodo, setUpdateTodo] = useState({ title: todo.title, details: todo.details });
+  const [updatedTodo, setUpdateTodo] = useState({
+    title: todo.title,
+    details: todo.details,
+  });
   const { todos, setTodos } = useContext(TodosContext);
 
   // Start Function to handle the check button click event
@@ -44,6 +47,7 @@ const Todo = ({ todo }) => {
       return t;
     });
     setTodos(updatedTodos);
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
   }
   // End Function to handle the check button click event
 
@@ -75,6 +79,7 @@ const Todo = ({ todo }) => {
       return t.id !== todo.id;
     });
     setTodos(updatedTodos);
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
   }
 
   // Confirm update action
@@ -88,6 +93,7 @@ const Todo = ({ todo }) => {
     });
     setTodos(updatedTodos);
     handleUpdateClose();
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
   }
 
   return (

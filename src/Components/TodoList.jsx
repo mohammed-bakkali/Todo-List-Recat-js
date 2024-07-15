@@ -15,23 +15,25 @@ import Todo from "./Todo";
 
 // OTHERS
 import { TodosContext } from "../Context/todosContext";
-import { useContext } from "react";
-import { useState } from "react";
+import { useState, useContext, useEffect } from "react";
 
 // Import UUID for generating unique IDs
 import { v4 as uuidv4 } from "uuid";
 
 export default function TodoList() {
-  const {todos, setTodos} = useContext(TodosContext);
-  
+  const { todos, setTodos } = useContext(TodosContext);
   const [titleInput, setTitleInput] = useState(""); // State for the input field
-
-
 
   // Convert the list of todos to JSX elements
   const todosJsx = todos.map((t) => {
-    return <Todo key={t.id} todo={t}  />;
+    return <Todo key={t.id} todo={t} />;
   });
+
+  useEffect(() => {
+    const storageTodos = JSON.parse(localStorage.getItem("todos"));
+    setTodos(storageTodos);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Function to handle the addition of a new todo item
   function handleAddClick() {
@@ -43,7 +45,9 @@ export default function TodoList() {
       isCompleted: false,
     };
     // Add the new todo to the list and clear the input field
-    setTodos([...todos, newTodo]);
+    const updatedTodos = [...todos, newTodo];
+    setTodos(updatedTodos);
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
     setTitleInput("");
   }
 
