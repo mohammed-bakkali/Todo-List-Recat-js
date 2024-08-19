@@ -15,24 +15,38 @@ import Todo from "./Todo";
 
 // OTHERS
 import { TodosContext } from "../Context/todosContext";
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useMemo } from "react";
+
+// DIALOG IMPORTS
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 // Import UUID for generating unique IDs
 import { v4 as uuidv4 } from "uuid";
 
 export default function TodoList() {
   const { todos, setTodos } = useContext(TodosContext);
+  const [dialogTodo, setdialogTodo] = useState(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [titleInput, setTitleInput] = useState(""); // State for the input field
   const [displayedTodosType, setDisplayedTodosType] = useState("all");
 
   // filteration arrays
-  const completedTodos = todos.filter((t) => {
-    return t.isCompleted;
-  });
-
-  const notcompletedTodos = todos.filter((t) => {
-    return !t.isCompleted;
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const completedTodos = useMemo(() => {
+    return todos.filter((t) => {
+      return t.isCompleted;
+    });
+  }, [todos]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const notcompletedTodos = useMemo(() => {
+    return todos.filter((t) => {
+      return !t.isCompleted;
+    });
+  }, [todos]);
 
   let todosToBeRendered = todos;
 
@@ -44,14 +58,9 @@ export default function TodoList() {
     todosToBeRendered = todos;
   }
 
-  // Convert the list of todos to JSX elements
-  const todosJsx = todosToBeRendered.map((t) => {
-    return <Todo key={t.id} todo={t} />;
-  });
-
   useEffect(() => {
-    const storageTodos = JSON.parse(localStorage.getItem("todos"));
-    setTodos(storageTodos) ?? [];
+    const storageTodos = JSON.parse(localStorage.getItem("todos")) ?? [];
+    setTodos(storageTodos);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -74,77 +83,129 @@ export default function TodoList() {
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
     setTitleInput("");
   }
+  // ==================== START HANDLERS ==================== //
+  // eslint-disable-next-line no-unused-vars
 
+  function openDeleteDialog(todo) {
+    setdialogTodo(todo);
+    setShowDeleteDialog(true);
+  }
+  // Close delete dialog
+  function handleDeleteModalClose() {
+    setShowDeleteDialog(false);
+  }
+  // Confirm delete action
+  function handleconfirmDelete() {
+    console.log(dialogTodo.id);
+
+    const updatedTodos = todos.filter((t) => {
+      return t.id !== dialogTodo.id;
+    });
+    setTodos(updatedTodos);
+    localStorage.setItem("todos", JSON.stringify(updatedTodos));
+    setShowDeleteDialog(false);
+  }
+  // ==================== END HANDLERS ==================== //
+  // Convert the list of todos to JSX elements
+  const todosJsx = todosToBeRendered.map((t) => {
+    return <Todo key={t.id} todo={t} showDelete={openDeleteDialog} />;
+  });
   return (
-    <Container maxWidth="sm">
-      <Card
-        sx={{ minWidth: 275 }}
-        style={{
-          maxHeight: "80vh",
-          overflow: "scroll",
-        }}
+    <>
+      {/* ==== START DELETE MODAL ====  */}
+      <Dialog
+        onClose={handleDeleteModalClose}
+        open={showDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
       >
-        <CardContent>
-          <Typography style={{ fontWeight: "bold" }} variant="h2">
-            My Tasks
-          </Typography>
-          <Divider />
+        <DialogTitle id="alert-dialog-title">
+          Are you sure you want to delete this task?
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteModalClose}>Cancel</Button>
+          <Button autoFocus onClick={handleconfirmDelete}>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* ==== END DELET MODAL ==== */}
 
-          {/* ==== START FILTER BUTTONS ==== */}
-          <ToggleButtonGroup
-            style={{ marginTop: "30px" }}
-            color="primary"
-            exclusive
-            aria-label="Platform"
-            value={displayedTodosType}
-            onChange={changeDisplayedType}
-          >
-            <ToggleButton value="all">All</ToggleButton>
-            <ToggleButton value="completed">Done</ToggleButton>
-            <ToggleButton value="non-completed">Unfulfilled</ToggleButton>
-          </ToggleButtonGroup>
-          {/* ==== END FILTER BUTTONS ==== */}
+      <Container maxWidth="sm">
+        <Card
+          sx={{ minWidth: 275 }}
+          style={{
+            maxHeight: "80vh",
+            overflow: "scroll",
+          }}
+        >
+          <CardContent>
+            <Typography style={{ fontWeight: "bold" }} variant="h2">
+              My Tasks
+            </Typography>
+            <Divider />
 
-          {/* ==== START ALL TODOS ==== */}
-          {todosJsx}
-          {/* ==== END ALL TODOS ==== */}
-
-          {/* ==== START ADD BUTTON ==== */}
-          <Grid container style={{ marginTop: "15px" }} spacing={2}>
-            <Grid
-              xs={4}
-              display="flex"
-              justifyContent="space-around"
-              alignItems="center"
+            {/* ==== START FILTER BUTTONS ==== */}
+            <ToggleButtonGroup
+              style={{ marginTop: "30px" }}
+              color="primary"
+              exclusive
+              aria-label="Platform"
+              value={displayedTodosType}
+              onChange={changeDisplayedType}
             >
-              <Button
-                style={{ width: "100%", height: "100%" }}
-                variant="contained"
-                onClick={handleAddClick}
-                disabled={titleInput.length <= 0}
+              <ToggleButton value="all">All</ToggleButton>
+              <ToggleButton value="completed">Done</ToggleButton>
+              <ToggleButton value="non-completed">Unfulfilled</ToggleButton>
+            </ToggleButtonGroup>
+            {/* ==== END FILTER BUTTONS ==== */}
+
+            {/* ==== START ALL TODOS ==== */}
+            {todosJsx}
+            {/* ==== END ALL TODOS ==== */}
+
+            {/* ==== START ADD BUTTON ==== */}
+            <Grid container style={{ marginTop: "15px" }} spacing={2}>
+              <Grid
+                xs={4}
+                display="flex"
+                justifyContent="space-around"
+                alignItems="center"
               >
-                Add Task
-              </Button>
+                <Button
+                  style={{ width: "100%", height: "100%" }}
+                  variant="contained"
+                  onClick={handleAddClick}
+                  disabled={titleInput.length <= 0}
+                >
+                  Add Task
+                </Button>
+              </Grid>
+              <Grid
+                xs={8}
+                display="flex"
+                justifyContent="space-around"
+                alignItems="center"
+              >
+                <TextField
+                  style={{ width: "100%" }}
+                  id="standard-basic"
+                  label="task title"
+                  variant="outlined"
+                  value={titleInput}
+                  onChange={(e) => setTitleInput(e.target.value)}
+                />
+              </Grid>
             </Grid>
-            <Grid
-              xs={8}
-              display="flex"
-              justifyContent="space-around"
-              alignItems="center"
-            >
-              <TextField
-                style={{ width: "100%" }}
-                id="standard-basic"
-                label="task title"
-                variant="outlined"
-                value={titleInput}
-                onChange={(e) => setTitleInput(e.target.value)}
-              />
-            </Grid>
-          </Grid>
-          {/* ==== END ADD BUTTON ==== */}
-        </CardContent>
-      </Card>
-    </Container>
+            {/* ==== END ADD BUTTON ==== */}
+          </CardContent>
+        </Card>
+      </Container>
+    </>
   );
 }

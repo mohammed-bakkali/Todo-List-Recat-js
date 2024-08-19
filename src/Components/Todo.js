@@ -24,8 +24,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import TextField from "@mui/material/TextField";
 
 // Todo component to display each individual task
-const Todo = ({ todo }) => {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+const Todo = ({ todo, showDelete }) => {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [updatedTodo, setUpdateTodo] = useState({
     title: todo.title,
@@ -48,28 +47,19 @@ const Todo = ({ todo }) => {
 
   // Handle delete button click event
   function handleDeleteClick() {
-    setShowDeleteDialog(true);
+    showDelete(todo);
   }
   // Handle update button click event
   function handleUpdateClick() {
     setShowUpdateDialog(true);
   }
   // Close delete dialog
-  function handleDeleteModalClose() {
-    setShowDeleteDialog(false);
-  }
+  // function handleDeleteModalClose() {
+  //   setShowDeleteDialog(false);
+  // }
   // Close update dialog
   function handleUpdateClose() {
     setShowUpdateDialog(false);
-  }
-
-  // Confirm delete action
-  function confirmDelete() {
-    const updatedTodos = todos.filter((t) => {
-      return t.id !== todo.id;
-    });
-    setTodos(updatedTodos);
-    localStorage.setItem("todos", JSON.stringify(updatedTodos));
   }
 
   // Confirm update action
@@ -88,30 +78,6 @@ const Todo = ({ todo }) => {
 
   return (
     <>
-      {/* ==== START DELETE MODAL ====  */}
-      <Dialog
-        onClose={handleDeleteModalClose}
-        open={showDeleteDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          Are you sure you want to delete this task?
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            This action cannot be undone.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteModalClose}>Cancel</Button>
-          <Button autoFocus onClick={confirmDelete}>
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* ==== END DELET MODAL ==== */}
-
       {/* ==== START UPDATE  MODAL ====  */}
       <Dialog
         onClose={handleUpdateClose}
