@@ -31,6 +31,7 @@ export default function TodoList() {
   const { todos, setTodos } = useContext(TodosContext);
   const [dialogTodo, setdialogTodo] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [titleInput, setTitleInput] = useState(""); // State for the input field
   const [displayedTodosType, setDisplayedTodosType] = useState("all");
 
@@ -85,7 +86,7 @@ export default function TodoList() {
   }
   // ==================== START HANDLERS ==================== //
   // eslint-disable-next-line no-unused-vars
-
+  // Delete Dialog
   function openDeleteDialog(todo) {
     setdialogTodo(todo);
     setShowDeleteDialog(true);
@@ -105,10 +106,40 @@ export default function TodoList() {
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
     setShowDeleteDialog(false);
   }
+
+  // Update Dialog
+  function openUpateDialog(todo) {
+    setdialogTodo(todo);
+    setShowUpdateDialog(true);
+  }
+  // Close update dialog
+  function handleUpdateClose() {
+    setShowUpdateDialog(false);
+  }
+  // Confirm update action
+  function handelconfirmUpdate() {
+    const updateTodos = todos.map((t) => {
+      if (t.id === dialogTodo.id) {
+        return { ...t, title: dialogTodo.title, details: dialogTodo.details };
+      } else {
+        return t;
+      }
+    });
+    setTodos(updateTodos);
+    handleUpdateClose();
+    localStorage.setItem("todos", JSON.stringify(updateTodos));
+  }
   // ==================== END HANDLERS ==================== //
   // Convert the list of todos to JSX elements
   const todosJsx = todosToBeRendered.map((t) => {
-    return <Todo key={t.id} todo={t} showDelete={openDeleteDialog} />;
+    return (
+      <Todo
+        key={t.id}
+        todo={t}
+        showDelete={openDeleteDialog}
+        showUpdate={openUpateDialog}
+      />
+    );
   });
   return (
     <>
@@ -135,6 +166,52 @@ export default function TodoList() {
         </DialogActions>
       </Dialog>
       {/* ==== END DELET MODAL ==== */}
+
+      {/* ==== START UPDATE  MODAL ====  */}
+      <Dialog
+        onClose={handleUpdateClose}
+        open={showUpdateDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">Edit Task</DialogTitle>
+        <DialogContent>
+          {dialogTodo && ( // Check if dialogTodo is not null
+            <>
+              <TextField
+                autoFocus
+                margin="dense"
+                id="name"
+                label="Title Task"
+                fullWidth
+                value={dialogTodo.title}
+                onChange={(e) => {
+                  setdialogTodo({ ...dialogTodo, title: e.target.value });
+                }}
+              />
+              <TextField
+                autoFocus
+                margin="dense"
+                id="details"
+                label="Details"
+                fullWidth
+                value={dialogTodo.details}
+                onChange={(e) => {
+                  setdialogTodo({ ...dialogTodo, details: e.target.value });
+                }}
+              />
+            </>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleUpdateClose}>Cancel</Button>
+          <Button autoFocus onClick={handelconfirmUpdate}>
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* ==== END UPDATE MODAL ==== */}
 
       <Container maxWidth="sm">
         <Card

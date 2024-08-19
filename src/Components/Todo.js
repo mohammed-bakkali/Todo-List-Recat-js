@@ -15,17 +15,17 @@ import { useContext, useState } from "react";
 import { TodosContext } from "../Context/todosContext";
 
 // DIALOG IMPORTS
-import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import TextField from "@mui/material/TextField";
+// import Button from "@mui/material/Button";
+// import Dialog from "@mui/material/Dialog";
+// import DialogActions from "@mui/material/DialogActions";
+// import DialogContent from "@mui/material/DialogContent";
+// import DialogContentText from "@mui/material/DialogContentText";
+// import DialogTitle from "@mui/material/DialogTitle";
+// import TextField from "@mui/material/TextField";
 
 // Todo component to display each individual task
-const Todo = ({ todo, showDelete }) => {
-  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+const Todo = ({ todo, showDelete, showUpdate }) => {
+
   const [updatedTodo, setUpdateTodo] = useState({
     title: todo.title,
     details: todo.details,
@@ -51,74 +51,13 @@ const Todo = ({ todo, showDelete }) => {
   }
   // Handle update button click event
   function handleUpdateClick() {
-    setShowUpdateDialog(true);
-  }
-  // Close delete dialog
-  // function handleDeleteModalClose() {
-  //   setShowDeleteDialog(false);
-  // }
-  // Close update dialog
-  function handleUpdateClose() {
-    setShowUpdateDialog(false);
+    showUpdate(todo);
   }
 
-  // Confirm update action
-  function confirmUpdate() {
-    const updatedTodos = todos.map((t) => {
-      if (t.id === todo.id) {
-        return { ...t, title: updatedTodo.title, details: updatedTodo.details };
-      } else {
-        return t;
-      }
-    });
-    setTodos(updatedTodos);
-    handleUpdateClose();
-    localStorage.setItem("todos", JSON.stringify(updatedTodos));
-  }
+  
 
   return (
     <>
-      {/* ==== START UPDATE  MODAL ====  */}
-      <Dialog
-        onClose={handleUpdateClose}
-        open={showUpdateDialog}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">Edit Task</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Title Task"
-            fullWidth
-            value={updatedTodo.title}
-            onChange={(e) => {
-              setUpdateTodo({ ...updatedTodo, title: e.target.value });
-            }}
-          />
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Details"
-            fullWidth
-            value={updatedTodo.details}
-            onChange={(e) => {
-              setUpdateTodo({ ...updatedTodo, details: e.target.value });
-            }}
-          />
-        </DialogContent>
-
-        <DialogActions>
-          <Button onClick={handleUpdateClose}>Cancel</Button>
-          <Button autoFocus onClick={confirmUpdate}>
-            Update
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* ==== END UPDATE MODAL ==== */}
       <Card
         className="todoCard"
         sx={{
