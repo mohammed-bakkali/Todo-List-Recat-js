@@ -4,7 +4,7 @@
 
 The React To-Do List application is a task management tool built with React that utilizes **Local Storage** for efficient data handling. By avoiding external APIs, this application ensures high performance and a seamless user experience with well-structured, extensible code.
 
-![To-Do List Application](assets/images/screenshot.png)
+![To-Do List Application](./src/assets/images/screenshot.png)
 
 ## Features
 
