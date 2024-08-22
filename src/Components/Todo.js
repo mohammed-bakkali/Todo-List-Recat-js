@@ -11,26 +11,16 @@ import ModeEditOutlinedIcon from "@mui/icons-material/ModeEditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 
 // OTHERS
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { TodosContext } from "../Context/todosContext";
+import { useToast } from "../Context/ToastContext";
 
-// DIALOG IMPORTS
-// import Button from "@mui/material/Button";
-// import Dialog from "@mui/material/Dialog";
-// import DialogActions from "@mui/material/DialogActions";
-// import DialogContent from "@mui/material/DialogContent";
-// import DialogContentText from "@mui/material/DialogContentText";
-// import DialogTitle from "@mui/material/DialogTitle";
-// import TextField from "@mui/material/TextField";
+
 
 // Todo component to display each individual task
 const Todo = ({ todo, showDelete, showUpdate }) => {
-
-  const [updatedTodo, setUpdateTodo] = useState({
-    title: todo.title,
-    details: todo.details,
-  });
   const { todos, setTodos } = useContext(TodosContext);
+  const { showHideToast } = useToast();
 
   // Start Function to handle the check button click event
   function handleCheckClick() {
@@ -42,6 +32,7 @@ const Todo = ({ todo, showDelete, showUpdate }) => {
     });
     setTodos(updatedTodos);
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
+    showHideToast("Changed successfully");
   }
   // End Function to handle the check button click event
 
@@ -53,8 +44,6 @@ const Todo = ({ todo, showDelete, showUpdate }) => {
   function handleUpdateClick() {
     showUpdate(todo);
   }
-
-  
 
   return (
     <>

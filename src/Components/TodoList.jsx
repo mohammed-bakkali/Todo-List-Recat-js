@@ -15,6 +15,8 @@ import Todo from "./Todo";
 
 // OTHERS
 import { TodosContext } from "../Context/todosContext";
+import { ToastContext } from "../Context/ToastContext";
+import { useToast } from "../Context/ToastContext";
 import { useState, useContext, useEffect, useMemo } from "react";
 
 // DIALOG IMPORTS
@@ -29,6 +31,8 @@ import { v4 as uuidv4 } from "uuid";
 
 export default function TodoList() {
   const { todos, setTodos } = useContext(TodosContext);
+  const { showHideToast } = useContext(ToastContext);
+
   const [dialogTodo, setdialogTodo] = useState(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
@@ -83,6 +87,7 @@ export default function TodoList() {
     setTodos(updatedTodos);
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
     setTitleInput("");
+    showHideToast("New mission added successfully");
   }
   // ==================== START HANDLERS ==================== //
   // eslint-disable-next-line no-unused-vars
@@ -105,6 +110,7 @@ export default function TodoList() {
     setTodos(updatedTodos);
     localStorage.setItem("todos", JSON.stringify(updatedTodos));
     setShowDeleteDialog(false);
+    showHideToast("Deleted successfully");
   }
 
   // Update Dialog
@@ -128,6 +134,7 @@ export default function TodoList() {
     setTodos(updateTodos);
     handleUpdateClose();
     localStorage.setItem("todos", JSON.stringify(updateTodos));
+    showHideToast("updated successfully");
   }
   // ==================== END HANDLERS ==================== //
   // Convert the list of todos to JSX elements
